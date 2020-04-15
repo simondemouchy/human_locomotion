@@ -1,0 +1,12 @@
+name: ramp-human-locomotion
+channels:
+  - defaults
+dependencies:
+  - jupyter
+  - matplotlib
+  - numpy
+  - pandas
+  - pip
+  - scikit-learn
+  - pip:
+    - ramp-workflow
