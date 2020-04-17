@@ -1,10 +1,6 @@
-import json
 import os
 import tarfile
 from os.path import join as pjoin
-
-import pandas as pd
-from sklearn.model_selection import train_test_split
 
 try:
     from urllib.request import urlretrieve
@@ -18,7 +14,7 @@ RANDOM_STATE = 777
 
 
 def download_data():
-    """This function downloads the data, extracts them and removes the archive."""
+    """Function to download the data, extract them and remove the archive."""
     if not os.path.exists(PATH_DATA):
         os.mkdir(PATH_DATA)
         print("Data are missing. Downloading them now (~150 Mo)...",

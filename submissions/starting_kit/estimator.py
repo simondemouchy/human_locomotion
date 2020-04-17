@@ -15,7 +15,8 @@ def _demean(X_list, copy=True):
     X_transformed = list()
 
     for walk in X_list:
-        # Do not forget that walk is (probably) not an array but an instance of WalkSignal.
+        # Do not forget that walk is (probably) not an array but an instance
+        # of WalkSignal.
         # The "real" signal is walk.signal
         if copy:
             walk_transformed = deepcopy(walk)
@@ -40,11 +41,12 @@ class Detector(BaseEstimator):
         y_pred = list()
         for signal in X:
             n_sample = signal.signal.shape[0]
-            if n_sample < 100:  # if signal is less than 1 sec long, no steps within
+            # if signal is less than 1s long, no steps within
+            if n_sample < 100:
                 step_list = list()
             else:
-                step_list = [[mid-50, mid+50-1]
-                             for mid in range(50, n_sample-50, 200)]
+                step_list = [[mid - 50, mid + 50 - 1]
+                             for mid in range(50, n_sample - 50, 200)]
             y_pred += [step_list]
 
         return np.array(y_pred, dtype=list)
@@ -61,6 +63,7 @@ def get_estimator():
     detector = Detector()
 
     # make pipeline
-    pipeline = Pipeline(steps=[('demean', demean_transformer), ('detector', detector)])
+    pipeline = Pipeline(steps=[('demean', demean_transformer),
+                               ('detector', detector)])
 
     return pipeline
