@@ -10,7 +10,7 @@ import rampwf as rw
 from rampwf.score_types import BaseScoreType
 from rampwf.prediction_types.base import BasePrediction
 from rampwf.utils.importing import import_module_from_source
-from rampwf.workflows import Regressor
+from rampwf.workflows import Estimator
 from sklearn.model_selection import StratifiedShuffleSplit
 
 DATA_HOME = "data"
@@ -130,89 +130,6 @@ def is_iterable(obj):
         return False
     else:
         return True
-
-# --------------------------------------
-# 1) The objects implementing the workflow
-# --------------------------------------
-
-
-class StepDetectionFeatureExtractor(object):
-    """
-    Essentially the same as in the Storm Forecast Ramp but the X_df and y_array are lists in
-    our case (not arrays).
-    """
-
-    def __init__(self, workflow_element_names=['feature_extractor']):
-        self.element_names = workflow_element_names
-
-    def train_submission(self, module_path, X_list, y_list, train_is=None):
-        feature_extractor = import_module_from_source(
-            pjoin(module_path, self.element_names[0] + '.py'),
-            self.element_names[0],
-            sanitize=True
-        )
-        sf_fe = feature_extractor.FeatureExtractor()
-
-        if train_is is None:
-            train_is = slice(None, None, None)
-
-        # sf_fe.fit(X_df.iloc[train_is], y_array[train_is])
-
-        if is_iterable(train_is):  # not sure about the type of train_is
-            sf_fe.fit([X_list[index] for index in train_is],
-                      [y_list[index] for index in train_is])
-        else:
-            sf_fe.fit(X_list[train_is], y_list[train_is])
-
-        return sf_fe
-
-    def test_submission(self, trained_model, X_list):
-        sf_fe = trained_model
-        X_test_list = sf_fe.transform(X_list)
-        return X_test_list
-
-
-class StepDetectionFeatureExtractorRegressor(object):
-    """
-    Essentially the same as in the Storm Forecast Ramp but the X_df and y_array are lists in
-    our case (not arrays).
-    """
-
-    def __init__(self,
-                 workflow_element_names=['feature_extractor', 'regressor']):
-        self.element_names = workflow_element_names
-        self.sf_feature_extractor_workflow = \
-            StepDetectionFeatureExtractor([self.element_names[0]])
-        self.regressor_workflow = Regressor([self.element_names[1]])
-
-    def train_submission(self, module_path, X_list, y_list, train_is=None):
-        if train_is is None:
-            train_is = slice(None, None, None)
-        sf_fe = self.sf_feature_extractor_workflow.train_submission(
-            module_path, X_list, y_list, train_is)
-
-        if is_iterable(train_is):  # not sure about the type of train_is
-            X_train_list = [X_list[index] for index in train_is]
-            y_train_list = [y_list[index] for index in train_is]
-        else:
-            X_train_list = X_list[train_is]
-            y_train_list = y_list[train_is]
-
-        X_train_list_transformed = self.sf_feature_extractor_workflow.test_submission(
-            sf_fe, X_train_list)
-        reg = self.regressor_workflow.train_submission(
-            module_path, X_train_list_transformed, y_train_list)
-        return sf_fe, reg
-
-    def test_submission(self, trained_model, X_list):
-        fe, reg = trained_model
-        # X_list.index = range(len(X_list))
-        X_test_list = self.sf_feature_extractor_workflow.test_submission(
-            fe, X_list)
-        y_pred = self.regressor_workflow.test_submission(reg, X_test_list)
-
-        return y_pred
-
 
 # --------------------------------------
 # 2) Object implementing the score type
@@ -387,36 +304,6 @@ class Predictions(BasePrediction):
         return combined_predictions
 
 
-# def _step_detection_init(self, y_pred=None, y_true=None, n_samples=None):
-#     """Essentially the same as in a regression task, but the prediction is a list not a float."""
-#     if y_pred is not None:
-#         self.y_pred = np.array(y_pred, dtype=list)
-#     elif y_true is not None:
-#         self.y_pred = np.array(y_true, dtype=list)
-#     elif n_samples is not None:
-#         if self.n_columns == 0:
-#             shape = (n_samples)
-#         else:
-#             shape = (n_samples, self.n_columns)
-#         self.y_pred = np.empty(shape, dtype=list)
-#         self.y_pred.fill(np.nan)
-#     else:
-#         raise ValueError(
-#             'Missing init argument: y_pred, y_true, or n_samples')
-#     self.check_y_pred_dimensions()
-
-
-# def make_step_detection(label_names=[]):
-#     Predictions = type(
-#         'StepDetection',
-#         (BasePrediction,),
-#         {'label_names': label_names,
-#          'n_columns': len(label_names),
-#          'n_columns_true': len(label_names),
-#          '__init__': _step_detection_init,
-#          })
-#     return Predictions
-
 def make_step_detection():
     return Predictions
 
@@ -427,7 +314,7 @@ def make_step_detection():
 
 problem_title = "Step Detection with Inertial Measurement Units"
 Predictions = make_step_detection()
-workflow = StepDetectionFeatureExtractorRegressor()
+workflow = Estimator()
 score_types = [FScoreStepDetection(name="F-score (step detection)")]
 
 
