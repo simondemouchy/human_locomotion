@@ -6,10 +6,8 @@ from os.path import join as pjoin
 
 import numpy as np
 import pandas as pd
-import rampwf as rw
 from rampwf.score_types import BaseScoreType
 from rampwf.prediction_types.base import BasePrediction
-from rampwf.utils.importing import import_module_from_source
 from rampwf.workflows import Estimator
 from sklearn.model_selection import StratifiedShuffleSplit
 
@@ -178,7 +176,7 @@ def count_detected(step_list_1, step_list_2):
     detected_index_set = set()
     n_detected = 0
     for (start, end) in step_list_2:
-        mid = (start+end)//2
+        mid = (start + end) // 2
         for (index, (start_true, end_true)) in enumerate(step_list_1):
             if (index not in detected_index_set) and (start_true <= mid < end_true):
                 n_detected += 1
@@ -208,7 +206,7 @@ def _step_detection_precision(y_true, y_pred):
 
     if n_steps_pred == 0:  # no step was predicted
         return 0.0
-    return n_detected/n_steps_pred
+    return n_detected / n_steps_pred
 
 
 def _step_detection_recall(y_true, y_pred):
@@ -228,7 +226,7 @@ def _step_detection_recall(y_true, y_pred):
     for (step_true, step_pred) in zip(y_true, y_pred):
         n_detected += count_detected(step_true, step_pred)
         n_steps_true += len(step_true)
-    return n_detected/n_steps_true
+    return n_detected / n_steps_true
 
 
 class FScoreStepDetection(BaseScoreType):
@@ -257,16 +255,16 @@ class FScoreStepDetection(BaseScoreType):
         prec = _step_detection_precision(y_true, y_pred)
         rec = _step_detection_recall(y_true, y_pred)
 
-        if prec+rec < 1e-6:
-            return 0.0
-        return 2*prec*rec/(prec+rec)
+        if prec + rec < 1e-6:
+            return 0.
+        return (2 * prec * rec) / (prec + rec)
 
 # --------------------------------------
 # 3) Prediction types
 # --------------------------------------
 
 
-class Predictions(BasePrediction):
+class _Predictions(BasePrediction):
 
     def __init__(self, y_pred=None, y_true=None, n_samples=None):
         """Essentially the same as in a regression task, but the prediction is a list not a float."""
@@ -305,7 +303,7 @@ class Predictions(BasePrediction):
 
 
 def make_step_detection():
-    return Predictions
+    return _Predictions
 
 # --------------------------------------
 # 4) Ramp problem definition
