@@ -16,7 +16,7 @@ install:
 script:
     - flake8 *.py submissions/*/*.py
     - python download_data.py
-    - jupyter nbconvert --execute human_locomotion_starting_kit.ipynb --ExecutePreprocessor.kernel_name=$IPYTHON_KERNEL
+    # - jupyter nbconvert --execute human_locomotion_starting_kit.ipynb --ExecutePreprocessor.kernel_name=$IPYTHON_KERNEL
     - ramp-test
 notifications:
   email: true
