@@ -1,13 +1,15 @@
 import json
 import os
+import typing
 from dataclasses import dataclass
 from itertools import tee
 from os.path import join as pjoin
 
 import numpy as np
 import pandas as pd
-from rampwf.score_types import BaseScoreType
+
 from rampwf.prediction_types.base import BasePrediction
+from rampwf.score_types import BaseScoreType
 from rampwf.workflows import Estimator
 from sklearn.model_selection import StratifiedShuffleSplit
 
@@ -33,7 +35,7 @@ class WalkSignal:
     pathology_group: str
     is_control: str
     foot: str  # left or right
-    signal: "typing.Any"  # numpy array or pandas dataframe
+    signal: typing.Any  # numpy array or pandas dataframe
 
     @classmethod
     def load_from_file(cls, code, data_home=DATA_HOME):
