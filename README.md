@@ -21,7 +21,7 @@ usage.
 
 ### Challenge description
 
-Get started on this RAMP with a dedicated notebook (coming soon).
+Get started on this RAMP with a [dedicated notebook](https://github.com/ramp-kits/human-locomotion/blob/master/human_locomotion_starting_kit.ipynb).
 
 ### Test a submission
 
