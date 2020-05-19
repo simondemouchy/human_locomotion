@@ -11,7 +11,7 @@ import pandas as pd
 from rampwf.prediction_types.base import BasePrediction
 from rampwf.score_types import BaseScoreType
 from rampwf.workflows import Estimator
-from sklearn.model_selection import StratifiedShuffleSplit
+from sklearn.model_selection import GroupShuffleSplit
 
 DATA_HOME = "data"
 RANDOM_STATE = 777
@@ -328,15 +328,11 @@ def get_test_data(path="."):
 
 def get_cv(X, y):
     """
-    In this cross-validation scheme, the proportion should have instances of each pathology in
-    sufficient proportion, therefore the cross-validation is stratified according to the
-    `pathology_group` attribute.
-
-    TODO: Check if we should do the same with `sensor`.
-    TODO: Ensure that for a single trial, the left and right signals are not in different folds
-    and test/train sets.
+    In this cross-validation scheme, for a single trial, the left and right signals are
+    not in different folds and test/train sets, therefore the cross-validation is
+    stratified according to the `code` attribute.
     """
-    cv = StratifiedShuffleSplit(
+    cv = GroupShuffleSplit(
         n_splits=5, test_size=0.2, random_state=RANDOM_STATE)
-    pathology_list = [signal.pathology_group for signal in X]
-    return cv.split(X, pathology_list)
+    code_list = [signal.code for signal in X]
+    return cv.split(X, y, code_list)
