@@ -59,7 +59,7 @@ class WalkSignal:
                         sensor=metadata["Sensor"],
                         pathology_group=metadata["PathologyGroup"],
                         is_control=metadata["IsControl"],
-                        foot="left",
+                        foot="Left",
                         signal=signal[left_foot_cols].rename(columns=lambda name: name[1:]))
         right_foot = cls(code=code,
                          age=metadata["Age"],
@@ -71,7 +71,7 @@ class WalkSignal:
                          sensor=metadata["Sensor"],
                          pathology_group=metadata["PathologyGroup"],
                          is_control=metadata["IsControl"],
-                         foot="right",
+                         foot="Right",
                          signal=signal[right_foot_cols].rename(columns=lambda name: name[1:]))
 
         return left_foot, right_foot
@@ -137,7 +137,7 @@ def is_iterable(obj):
 
 
 def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
