@@ -2,7 +2,6 @@ from random import choice, seed
 
 import numpy as np
 from scipy.signal import argrelmax
-from scipy.stats.stats import pearsonr
 from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 
@@ -42,7 +41,7 @@ class Detector(BaseEstimator):
             score[score < self.threshold] = 0.0
             # to find local maxima
             indexes, = argrelmax(score.to_numpy(), order=self.order)
-            predicted_steps = [[t-self.order, t+self.order] for t in indexes]
+            predicted_steps = [[t - self.order, t + self.order] for t in indexes]
             y_pred += [predicted_steps]
         return np.array(y_pred, dtype=list)
 
