@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import typing
 from dataclasses import dataclass
 from itertools import tee
@@ -15,6 +16,7 @@ from sklearn.model_selection import GroupShuffleSplit
 
 DATA_HOME = "data"
 RANDOM_STATE = 777
+random.seed(RANDOM_STATE)
 
 # --------------------------------------
 # 0) Utils to manipulate data
@@ -111,9 +113,15 @@ def _read_data(path, train_or_test="train"):
     code_list = [fname.split(".")[0] for fname in os.listdir(
         folder) if fname.endswith(".csv")]
 
+    test = os.getenv('RAMP_TEST_MODE', 0)  # are we in test mode
+    if test:
+        code_sublist = random.sample(code_list, 5)
+    else:
+        code_sublist = code_list
+
     X = list()
     y = list()
-    for code in code_list:
+    for code in code_sublist:
         left_signal, right_signal = WalkSignal.load_from_file(code, folder)
         left_steps, right_steps = load_steps(code, folder)
         X.extend((left_signal, right_signal))
