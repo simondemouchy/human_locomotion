@@ -20,15 +20,16 @@ class Detector(BaseEstimator):
             y), f"Wrong dimensions (len(X): {len(X)}, len(y): {len(y)})."
 
         # take a step at random
-        trial, step_list = choice([*zip(X, y)])
+        sensor_data, step_list = choice([*zip(X, y)])
         start, end = choice(step_list)
-        self.step_template = trial.signal[["AX", "AY", "AZ", "AV"]][start:end]
+        self.step_template = sensor_data.signal[[
+            "AX", "AY", "AZ", "AV"]][start:end]
         return self
 
     def predict(self, X):
         y_pred = list()
-        for trial in X:
-            score = (trial.signal[["AX", "AY", "AZ", "AV"]]  # select the accelerations
+        for sensor_data in X:
+            score = (sensor_data.signal[["AX", "AY", "AZ", "AV"]]  # select the accelerations
                      # sliding window, same shape as the template
                      .rolling(self.step_template.shape[0], center=True)
                      # correlations
@@ -41,7 +42,8 @@ class Detector(BaseEstimator):
             score[score < self.threshold] = 0.0
             # to find local maxima
             indexes, = argrelmax(score.to_numpy(), order=self.order)
-            predicted_steps = [[t - self.order, t + self.order] for t in indexes]
+            predicted_steps = [[t - self.order, t + self.order]
+                               for t in indexes]
             y_pred += [predicted_steps]
         return np.array(y_pred, dtype=list)
 
