@@ -1,6 +1,5 @@
 import json
 import os
-import random
 import typing
 from dataclasses import dataclass
 from os.path import join as pjoin
@@ -14,7 +13,7 @@ from sklearn.model_selection import GroupShuffleSplit
 
 DATA_HOME = "data"
 RANDOM_STATE = 777
-random.seed(RANDOM_STATE)
+rng = np.random.RandomState(RANDOM_STATE)
 
 # --------------------------------------
 # 0) Utils to manipulate data
@@ -113,7 +112,7 @@ def _read_data(path, train_or_test="train"):
 
     test = os.getenv('RAMP_TEST_MODE', 0)  # are we in test mode
     if test:
-        code_sublist = random.sample(code_list, 5)
+        code_sublist = rng.choice(code_list, 5, replace=False)
     else:
         code_sublist = code_list
 

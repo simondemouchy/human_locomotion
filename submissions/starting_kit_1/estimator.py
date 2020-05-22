@@ -1,12 +1,10 @@
-from random import choice, seed
-
 import numpy as np
 from scipy.signal import argrelmax
 from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 
 RANDOM_STATE = 7
-seed(RANDOM_STATE)
+rng = np.random.RandomState(RANDOM_STATE)
 
 
 class Detector(BaseEstimator):
@@ -20,8 +18,10 @@ class Detector(BaseEstimator):
             y), f"Wrong dimensions (len(X): {len(X)}, len(y): {len(y)})."
 
         # take a step at random
-        sensor_data, step_list = choice([*zip(X, y)])
-        start, end = choice(step_list)
+        index = rng.choice(len(X))
+        sensor_data, step_list = X[index], y[index]
+        step_index = rng.choice(len(step_list))
+        start, end = step_list[step_index]
         self.step_template = sensor_data.signal[[
             "AX", "AY", "AZ", "AV"]][start:end]
         return self
